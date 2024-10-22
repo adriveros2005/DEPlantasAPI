@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Enfermedades de Plantas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Subir Imagen para Predicción</h1>
+        <p>Sube una imagen para detectar si la planta tiene una enfermedad.</p>
+
+        <form id="upload-form" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="image">Selecciona una imagen:</label>
+                <input type="file" class="form-control-file" id="image" name="image" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Predecir</button>
+        </form>
+
+        <div id="result" class="mt-5"></div>
+    </div>
+
+    <script>
+        document.getElementById("upload-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const image = document.getElementById("image").files[0];
+            formData.append("image", image);
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("result").innerHTML = `
+                        <h3>Resultado de la Predicción:</h3>
+                        <p><strong>Clase predicha:</strong> ${result.prediction}</p>
+                        <p><strong>Confianza:</strong> ${result.confidence}</p>
+                    `;
+                } else {
+                    document.getElementById("result").innerHTML = `
+                        <h3>Error:</h3>
+                        <p>${result.error}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById("result").innerHTML = `
+                    <h3>Error:</h3>
+                    <p>${error}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
