@@ -1,0 +1,7 @@
+flask
+numpy
+pandas
+tensorflow
+Pillow
+keras
+# Agrega más dependencias según sea necesario
