@@ -21,7 +21,7 @@ header {
 
 header:hover {
     background: linear-gradient(90deg, #388e3c, #66bb6a);
-    transform: translateY(-2px); /* Suave elevación al hacer hover */
+    transform: translateY(-2px);
 }
 
 .container {
@@ -104,7 +104,7 @@ form input[type="file"]:hover {
 #result-container {
     display: flex;
     justify-content: center;
-    align-items: center; /* Centrar verticalmente */
+    align-items: center;
     margin-top: 20px;
 }
 
@@ -164,5 +164,39 @@ footer p:hover {
     .button {
         width: 100%; 
         padding: 10px; 
+    }
+}
+
+.navbar {
+    width: 100%;
+}
+
+.navbar-brand {
+    white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    font-size: 1.2rem;
+}
+
+.nav-link {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .nav-item {
+        margin: 0;
+    }
+
+    .nav-link {
+        padding: 8px 0;
     }
 }
