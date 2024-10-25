@@ -1,9 +1,8 @@
-flask
-numpy
+Flask
+gunicorn
 pandas
 tensorflow
 Pillow
-keras
 GitPython
-tensorflow-cpu
-# Agrega más dependencias según sea necesario
+matplotlib
+scikit-learn

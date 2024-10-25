@@ -11,6 +11,12 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 import matplotlib.pyplot as plt
+from tensorflow.keras.callbacks import EarlyStopping
+
+# Configuración de la semilla aleatoria para reproducibilidad
+random.seed(42)
+np.random.seed(42)
+tf.random.set_seed(42)
 
 # Ruta de imágenes (modifica esta ruta según tu sistema)
 base_dir = "PlantVillage-Dataset/raw/color/"
@@ -22,13 +28,13 @@ healthy_folders = ['Apple___healthy', 'Blueberry___healthy', 'Cherry_(including_
 disease_folders = [folder for folder in os.listdir(base_dir) if "healthy" not in folder and folder != '.git']
 
 # Diccionario para guardar las imágenes
-sampled_data_dir = 'sample_data'  # Cambia la ruta si es necesario
+sampled_data_dir = 'sample_data'
 os.makedirs(sampled_data_dir, exist_ok=True)
 
 # Diccionario para almacenar las rutas y sus respectivas carpetas
 image_source = {}
 
-# Función para agarrar muestra de imágenes de manera random de cada carpeta y guardar origen
+# Función para muestrear imágenes
 def sample_images(folder_list, label, sample_size=1000):
     img_paths = []
     labels = []
@@ -44,8 +50,7 @@ def sample_images(folder_list, label, sample_size=1000):
             shutil.copy(img_src, img_dst)
             img_paths.append(img_dst)
             labels.append(label)
-            # Guardar el origen de la imagen
-            image_source[img_dst] = folder  # Aca se almacena la carpeta de origen
+            image_source[img_dst] = folder  # Guardar el origen de la imagen
 
     return img_paths, labels
 
@@ -64,7 +69,7 @@ train_paths, val_paths, train_labels, val_labels = train_test_split(train_paths,
 # Generador de data (normalizar)
 datagen = ImageDataGenerator(rescale=1./255)
 
-# Generador personalizado que carga imágenes y rutas de origen (ajustado para solo devolver images y labels)
+# Generador personalizado que carga imágenes
 def create_generator(image_paths, labels, batch_size=32):
     while True:
         for i in range(0, len(image_paths), batch_size):
@@ -73,16 +78,19 @@ def create_generator(image_paths, labels, batch_size=32):
             images = []
 
             for img_path in batch_paths:
-                img = tf.keras.preprocessing.image.load_img(img_path, target_size=(128, 128))
-                img = tf.keras.preprocessing.image.img_to_array(img)
-                images.append(img)
+                try:
+                    img = tf.keras.preprocessing.image.load_img(img_path, target_size=(128, 128))
+                    img = tf.keras.preprocessing.image.img_to_array(img)
+                    images.append(img)
+                except Exception as e:
+                    print(f"Error cargando la imagen {img_path}: {e}")
 
-            images = np.array(images) / 255.0  # Normalize
+            images = np.array(images) / 255.0  # Normalizar
             batch_labels = to_categorical(batch_labels, num_classes=2)  # One-hot encode the labels
 
             yield images, batch_labels  # Devolver solo images y labels
 
-# Generadores de train, test y val con el generador ajustado
+# Generadores de train, test y val
 train_gen = create_generator(train_paths, train_labels)
 val_gen = create_generator(val_paths, val_labels)
 test_gen = create_generator(test_paths, test_labels)
@@ -109,9 +117,12 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy']
 
 # Parámetros para entrenamiento
 batch_size = 32
-epochs = 10
+epochs = 20  # Aumentado para mejor ajuste
 steps_per_epoch = len(train_paths) // batch_size
 validation_steps = len(val_paths) // batch_size
+
+# Callback para detener el entrenamiento si no hay mejoras
+early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
 # Entrenar el modelo
 history = model.fit(
@@ -119,18 +130,17 @@ history = model.fit(
     steps_per_epoch=steps_per_epoch,
     epochs=epochs,
     validation_data=val_gen,
-    validation_steps=validation_steps
+    validation_steps=validation_steps,
+    callbacks=[early_stopping]  # Añadido callback
 )
 
 # Evaluar el modelo con el set de prueba
 test_loss, test_acc = model.evaluate(test_gen, steps=len(test_paths) // batch_size)
 print(f"Precisión en el set de prueba: {test_acc * 100:.2f}%")
 
-# Gráfica de precisión con 10 etapas
+# Gráfica de precisión por épocas
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
-
-# Crear un gráfico con los valores de precisión por épocas
 epochs_range = range(1, len(acc) + 1)
 
 plt.figure(figsize=(8, 6))
@@ -143,5 +153,5 @@ plt.legend(loc='lower right')
 plt.grid(True)
 plt.show()
 
-# Guardar el modelo entrenado
-model.save('modelo_entrenado.h5')
+# Guardar el modelo entrenado con extensión consistente
+model.save('modelo_entrenado.keras')

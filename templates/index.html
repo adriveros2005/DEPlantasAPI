@@ -3,27 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predicción de Enfermedades de Plantas</title>
+    <title>🍀 DEPlantasAPI</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </head>
 <body>
-    <div class="container">
-        <h1 class="mt-5">Subir Imagen para Predicción</h1>
-        <p>Sube una imagen para detectar si la planta tiene una enfermedad.</p>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">🍀 Predicción de Enfermedades</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">Sobre Nosotras</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#contact">Contacto</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
+    <div class="container mt-5">
+        <h1>Subir Imagen para Predicción</h1>
+        <p>Sube una imagen para detectar si la planta tiene una enfermedad.</p>
+    
         <form id="upload-form" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="image">Selecciona una imagen:</label>
-                <input type="file" class="form-control-file" id="image" name="image" required>
+                <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
             </div>
-            <button type="submit" class="btn btn-primary">Predecir</button>
+            <button type="button" class="btn btn-secondary" id="load-image">Cargar Imagen</button>
+            <button type="submit" class="btn btn-primary" id="predict">Predecir</button>
+            <button type="button" class="btn btn-danger" id="reset">Borrar Selección</button>
         </form>
-
-        <div id="result" class="mt-5"></div>
+    
+        <div class="d-flex justify-content-center align-items-start mt-3" id="result-container">
+            <div id="image-preview" class="me-3"></div>
+            <div id="result" class="flex-grow-1"></div>
+        </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-dark text-center text-light text-lg-start mt-5">
+        <div class="text-center p-3">
+            <span>Detección de Enfermedades en Plantas - Mil Mujeres en IA</span>
+        </div>
+    </footer>
+
     <script>
+        // Variables globales para almacenar la imagen cargada
+        let loadedImageUrl = "";
+
+        // Función para mostrar la imagen cargada
+        document.getElementById("load-image").addEventListener("click", function() {
+            const imageInput = document.getElementById("image").files[0];
+
+            if (imageInput) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    loadedImageUrl = e.target.result; // Guardar la URL de la imagen
+                    document.getElementById("image-preview").innerHTML = `
+                        <h4>Imagen Cargada:</h4>
+                        <img src="${loadedImageUrl}" alt="Imagen para predicción" class="img-fluid" style="max-height: 400px;">
+                    `;
+                }
+                reader.readAsDataURL(imageInput);
+            } else {
+                alert("Por favor, selecciona una imagen primero.");
+            }
+        });
+
+        // Evento para el envío del formulario
         document.getElementById("upload-form").addEventListener("submit", async function(event) {
             event.preventDefault();
 
@@ -41,9 +99,30 @@
                 if (response.ok) {
                     document.getElementById("result").innerHTML = `
                         <h3>Resultado de la Predicción:</h3>
+                        <h5>Detalles de la Predicción</h5>
                         <p><strong>Clase predicha:</strong> ${result.prediction}</p>
                         <p><strong>Confianza:</strong> ${result.confidence}</p>
+                        <p><strong>Descripción:</strong> ${result.description || "No hay información adicional disponible."}</p>
+                        <button class="btn btn-success" id="print-pdf">Imprimir en PDF</button>
                     `;
+
+                    // Agregar evento para imprimir el resultado en PDF
+                    document.getElementById("print-pdf").addEventListener("click", function() {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+
+                        doc.setFontSize(16);
+                        doc.text("Resultado de la Predicción", 20, 20);
+                        doc.text(`Clase predicha: ${result.prediction}`, 20, 40);
+                        doc.text(`Confianza: ${result.confidence}`, 20, 60);
+                        doc.text(`Descripción: ${result.description || "No hay información adicional disponible."}`, 20, 80);
+                        
+                        // Incluir la imagen en el PDF
+                        if (loadedImageUrl) {
+                            doc.addImage(loadedImageUrl, 'JPEG', 20, 100, 150, 150); // Ajusta tamaño y posición
+                        }
+                        doc.save("resultado_prediccion.pdf");
+                    });
                 } else {
                     document.getElementById("result").innerHTML = `
                         <h3>Error:</h3>
@@ -56,6 +135,14 @@
                     <p>${error}</p>
                 `;
             }
+        });
+
+        // Función para borrar la selección y restablecer el formulario
+        document.getElementById("reset").addEventListener("click", function() {
+            document.getElementById("image").value = "";
+            document.getElementById("image-preview").innerHTML = "";
+            document.getElementById("result").innerHTML = "";
+            loadedImageUrl = ""; // Reiniciar la URL de la imagen cargada
         });
     </script>
 </body>

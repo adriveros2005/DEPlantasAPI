@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 body {
@@ -11,30 +10,37 @@ body {
 }
 
 header {
-    background: linear-gradient(90deg, #007bff, #00c6ff); 
+    background: linear-gradient(90deg, #4caf50, #81c784); 
     color: white;
     padding: 20px 0;
     text-align: center;
-    border-radius: 8px 8px 0 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+header:hover {
+    background: linear-gradient(90deg, #388e3c, #66bb6a);
+    transform: translateY(-2px); /* Suave elevación al hacer hover */
 }
 
 .container {
     max-width: 800px;
     margin: 20px auto;
     background: #1a1a1a; 
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
     padding: 20px;
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .container:hover {
     transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
 .button {
-    background: linear-gradient(90deg, #28a745, #85e0a8); 
+    background: linear-gradient(90deg, #66bb6a, #a5d6a7); 
     color: white;
     padding: 12px 20px;
     border: none;
@@ -42,12 +48,14 @@ header {
     cursor: pointer;
     font-weight: 600;
     font-size: 16px;
-    transition: background 0.3s ease, transform 0.2s ease; 
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; 
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .button:hover {
-    background: linear-gradient(90deg, #218838, #6bcf8e); 
+    background: linear-gradient(90deg, #388e3c, #66bb6a); 
     transform: translateY(-3px); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .prediction {
@@ -56,16 +64,24 @@ header {
     background: rgba(255, 255, 255, 0.1); 
     border: 1px solid rgba(255, 255, 255, 0.2); 
     border-radius: 5px;
-    transition: background 0.3s ease; 
+    transition: background 0.3s ease, transform 0.2s ease; 
 }
 
 .prediction:hover {
     background: rgba(255, 255, 255, 0.2); 
+    transform: translateY(-2px);
+}
+
+h1 {
+    color: #4caf50; 
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); 
+    margin-bottom: 10px;
 }
 
 h2 {
-    color: #00c6ff; 
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
+    color: #81c784; 
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); 
+    margin-bottom: 15px;
 }
 
 form {
@@ -74,6 +90,52 @@ form {
     gap: 10px; 
 }
 
+form input[type="file"] {
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 10px;
+    transition: border-color 0.3s ease; 
+}
+
+form input[type="file"]:hover {
+    border-color: #4caf50; 
+}
+
+#result-container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Centrar verticalmente */
+    margin-top: 20px;
+}
+
+#image-preview {
+    max-width: 400px; 
+    transition: transform 0.3s ease; 
+}
+
+#image-preview img {
+    max-width: 100%; 
+    border-radius: 5px; 
+}
+
+#result {
+    margin-left: 20px; 
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #0d0d0d;
+}
+
+footer p {
+    margin: 5px 0;
+    transition: color 0.3s ease; 
+}
+
+footer p:hover {
+    color: #4caf50; 
+}
 
 @media (max-width: 768px) {
     body {
@@ -91,8 +153,12 @@ form {
 }
 
 @media (max-width: 480px) {
-    h2 {
+    h1 {
         font-size: 24px; 
+    }
+
+    h2 {
+        font-size: 20px; 
     }
 
     .button {
