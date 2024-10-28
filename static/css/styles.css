@@ -176,6 +176,11 @@ footer p:hover {
     align-items: center;
 }
 
+.navbar i {
+    font-size: 1.5em;
+    font-weight: bolder;
+}
+
 .navbar-brand {
     color: #333;
     font-weight: 600;
@@ -215,23 +220,6 @@ footer p:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.navbar-toggler {
-    border: none;
-    background: none;
-    color: #333;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: none;
-}
-
-.navbar-collapse {
-    display: none;
-}
-
-.navbar-collapse.show {
-    display: block;
-}
-
 @media (max-width: 768px) {
     body {
         padding: 10px; 
@@ -247,13 +235,6 @@ footer p:hover {
         display: none;
         text-align: left;
         padding: 0;
-    }
-    .navbar-toggler {
-        display: block;
-    }
-    .navbar-toggler.active + .navbar-nav {
-        display: flex;
-        transition: max-height 0.3s ease;
     }
     .container {
         padding: 15px; 
