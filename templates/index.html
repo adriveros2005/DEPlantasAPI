@@ -102,6 +102,7 @@
                         <h5>Detalles de la predicción</h5>
                         <p><strong>Clase predicha:</strong> ${result.prediction}</p>
                         <p><strong>Confianza:</strong> ${result.confidence}</p>
+                        <p><strong>Mensaje de confianza:</strong> ${result.confidence_message}</p>
                         <p><strong>Descripción:</strong> ${result.description || "No hay información adicional disponible."}</p>
                         <button class="btn btn-success" id="print-pdf">Imprimir en PDF</button>
                     `;
@@ -114,10 +115,11 @@
                         doc.text("Resultado de la predicción", 20, 20);
                         doc.text(`Clase predicha: ${result.prediction}`, 20, 40);
                         doc.text(`Confianza: ${result.confidence}`, 20, 60);
-                        doc.text(`Descripción: ${result.description || "No hay información adicional disponible."}`, 20, 80);
+                        doc.text(`Mensaje de confianza: ${result.confidence_message}`, 20, 80);
+                        doc.text(`Descripción: ${result.description || "No hay información adicional disponible."}`, 20, 100);
                         
                         if (loadedImageUrl) {
-                            doc.addImage(loadedImageUrl, 'JPEG', 20, 100, 150, 150);
+                            doc.addImage(loadedImageUrl, 'JPEG', 20, 120, 150, 150);
                         }
                         doc.save("resultado_prediccion.pdf");
                     });
